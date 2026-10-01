@@ -1,4 +1,3 @@
-
 # PsyDigest (serverless edition) configuration
 # Overrides the built-in defaults (deep merge). Delete keys you don't want
 # to change. Never put your Mistral API key here — it belongs in the GitHub
@@ -6,7 +5,7 @@
 
 site:
   # Set to your GitHub Pages URL — used in the RSS channel:
-  base_url: "https://lajf79.github.io/psydigest/"
+  base_url: "https://YOUR-USERNAME.github.io/psydigest/"
   retention_days: 90          # articles kept in data.json / searchable archive
   rss_limit: 50
 
@@ -33,7 +32,9 @@ queries:
       OR "Br J Psychiatry"[ta] OR "Acta Psychiatr Scand"[ta]
       OR "Eur Neuropsychopharmacol"[ta] OR "J Clin Psychiatry"[ta]
       OR "Psychol Med"[ta] OR "Schizophr Bull"[ta] OR "Transl Psychiatry"[ta]
-      OR "Gen Psychiatry"[ta] OR "BMC Psychiatry"[ta] OR "Nord J Psychiatry"[ta])
+      OR "Gen Psychiatry"[ta] OR "BMC Psychiatry"[ta] OR "Nord J Psychiatry"[ta]
+      OR "CNS Drugs"[ta] OR "BMJ Ment Health"[ta] OR "Eur Psychiatry"[ta]
+      OR "Curr Opin Psychiatry"[ta])
   - name: Psychosis spectrum
     term: >-
       ("Schizophrenia"[MeSH] OR "Psychotic Disorders"[MeSH])
@@ -69,6 +70,39 @@ queries:
       AND (psychiatr*[tiab] OR "Mental Disorders"[MeSH]
       OR "mental health"[tiab] OR antipsychotic*[tiab]
       OR antidepressant*[tiab] OR suicide[tiab])
+  - name: Personality disorders
+    term: >-
+      "Personality Disorders"[MeSH]
+      AND (treatment OR therapy OR trial OR psychotherap* OR management)
+  - name: Perinatal psychiatry
+    term: >-
+      ("Depression, Postpartum"[MeSH]
+      OR (perinatal[tiab] AND (psychiatr*[tiab] OR mental[tiab])))
+      AND (treatment OR therapy OR trial OR antidepressant*
+      OR psychotherap* OR prevention)
+  - name: Sleep and insomnia treatments
+    term: >-
+      "Sleep Initiation and Maintenance Disorders"[MeSH]
+      AND (treatment OR therapy OR trial OR CBT OR pharmacol*)
+  - name: ECT, TMS, ketamine and psychedelic trials
+    term: >-
+      ("Electroconvulsive Therapy"[MeSH]
+      OR "Transcranial Magnetic Stimulation"[MeSH]
+      OR ketamine[tiab] OR esketamine[tiab] OR psilocybin[tiab] OR MDMA[tiab])
+      AND (psychiatr*[tiab] OR "Mental Disorders"[MeSH])
+  - name: Cardiometabolic and physical health in SMI
+    term: >-
+      ("Severe Mental Illness"[tiab] OR "serious mental illness"[tiab]
+      OR schizophrenia[tiab] OR "Bipolar Disorder"[MeSH])
+      AND (cardiometabolic[tiab] OR "metabolic syndrome"[tiab] OR mortality
+      OR "physical health"[tiab] OR cardiovascular)
+      AND (treatment OR trial OR guideline* OR cohort OR risk OR management)
+  - name: Cochrane psychiatry reviews
+    term: >-
+      "Cochrane Database Syst Rev"[ta]
+      AND (psychiatr*[tiab] OR "Mental Disorders"[MeSH]
+      OR antipsychotic*[tiab] OR antidepressant*[tiab]
+      OR schizophrenia[tiab] OR depression[tiab] OR bipolar[tiab])
 
 priority_journals:
   - world psychiatry
@@ -86,6 +120,10 @@ priority_journals:
   - transl psychiatry
   - gen psychiatry
   - nord j psychiatry
+  - cns drugs
+  - bmj ment health
+  - eur psychiatry
+  - curr opin psychiatry
 
 # Links shown at the bottom of the site for manual guideline checks.
 watch_links:
