@@ -1,0 +1,105 @@
+
+# PsyDigest (serverless edition) configuration
+# Overrides the built-in defaults (deep merge). Delete keys you don't want
+# to change. Never put your Mistral API key here — it belongs in the GitHub
+# Actions secret MISTRAL_API_KEY.
+
+site:
+  # Set to your GitHub Pages URL — used in the RSS channel:
+  base_url: "https://lajf79.github.io/psydigest/"
+  retention_days: 90          # articles kept in data.json / searchable archive
+  rss_limit: 50
+
+pubmed:
+  email: ""                    # your e-mail; polite to NCBI, optional
+  api_key: ""                  # optional NCBI API key (3 -> 10 req/s)
+  days_back: 3                 # daily overlap so a missed run leaves no gap
+  initial_backfill_days: 14    # first ever run looks this far back
+  max_records_per_query: 100
+  guideline_days_back: 30
+
+llm:
+  model: mistral-small-latest
+  min_score_for_summary: 6     # relevance score needed for an LLM summary
+  max_summaries_per_run: 25    # daily LLM budget (cost control)
+
+# PubMed queries — any valid PubMed syntax works (MeSH, [tiab], [ta], boolean).
+# A query may set "category": "Guidelines" to route hits to the guideline filter.
+queries:
+  - name: Key psychiatry journals (all content)
+    term: >-
+      ("World Psychiatry"[ta] OR "Lancet Psychiatry"[ta] OR "JAMA Psychiatry"[ta]
+      OR "Am J Psychiatry"[ta] OR "Mol Psychiatry"[ta] OR "Biol Psychiatry"[ta]
+      OR "Br J Psychiatry"[ta] OR "Acta Psychiatr Scand"[ta]
+      OR "Eur Neuropsychopharmacol"[ta] OR "J Clin Psychiatry"[ta]
+      OR "Psychol Med"[ta] OR "Schizophr Bull"[ta] OR "Transl Psychiatry"[ta]
+      OR "Gen Psychiatry"[ta] OR "BMC Psychiatry"[ta] OR "Nord J Psychiatry"[ta])
+  - name: Psychosis spectrum
+    term: >-
+      ("Schizophrenia"[MeSH] OR "Psychotic Disorders"[MeSH])
+  - name: Affective disorders
+    term: >-
+      ("Depressive Disorder"[MeSH] OR "Bipolar Disorder"[MeSH])
+      AND (treatment OR therapy OR trial OR antidepressant* OR psychotherap*
+      OR prophyla* OR maintenance OR relapse OR prevention OR guideline*)
+  - name: Anxiety, OCD, trauma
+    term: >-
+      ("Anxiety Disorders"[MeSH] OR "Obsessive-Compulsive Disorder"[MeSH]
+      OR "Stress Disorders, Post-Traumatic"[MeSH])
+      AND (treatment OR therapy OR trial OR psychotherap* OR prevention)
+  - name: ADHD and autism
+    term: >-
+      ("Attention Deficit Hyperactivity Disorder"[MeSH]
+      OR "Autism Spectrum Disorder"[MeSH] OR ADHD[tiab] OR autistic[tiab])
+      AND (treatment OR therapy OR trial OR medication OR guideline*)
+  - name: Substance use disorders
+    term: >-
+      "Substance-Related Disorders"[MeSH]
+      AND (treatment OR therapy OR trial OR prevention OR guideline*)
+  - name: Eating disorders
+    term: '"Eating Disorders"[MeSH]'
+  - name: Suicide and self-harm
+    term: >-
+      ("Suicide"[MeSH] OR "Self-Injurious Behavior"[MeSH])
+      AND (risk OR prevention OR prediction OR intervention OR screening)
+  - name: Guidelines & recommendations
+    category: Guidelines
+    term: >-
+      ("Practice Guideline"[pt] OR guideline*[ti])
+      AND (psychiatr*[tiab] OR "Mental Disorders"[MeSH]
+      OR "mental health"[tiab] OR antipsychotic*[tiab]
+      OR antidepressant*[tiab] OR suicide[tiab])
+
+priority_journals:
+  - world psychiatry
+  - lancet psychiatry
+  - jama psychiatry
+  - am j psychiatry
+  - mol psychiatry
+  - biol psychiatry
+  - br j psychiatry
+  - acta Psychiatr Scand
+  - eur neuropsychopharmacol
+  - j clin psychiatry
+  - psychol med
+  - schizophr bull
+  - transl psychiatry
+  - gen psychiatry
+  - nord j psychiatry
+
+# Links shown at the bottom of the site for manual guideline checks.
+watch_links:
+  - name: NICE — guidelines and newsletters
+    url: https://www.nice.org.uk/guidance
+    note: >-
+      Filter: Mental health and wellbeing. Sign up for InDepth alerts:
+      https://www.nice.org.uk/nice-newsletters-and-alerts
+  - name: Socialstyrelsen — kunskapsstöd och nyhetsbrev
+    url: https://www.socialstyrelsen.se/kunskapsstod-och-regler/
+    note: >-
+      Nyhetsbrev (ca två gånger per månad):
+      https://www.socialstyrelsen.se/om-socialstyrelsen/nyhetsbrev/
+  - name: WFSBP — biological psychiatry guidelines
+    url: https://www.wfsbp.org/guidelines/
+  - name: Läkemedelsverket — behandlingsrekommendationer
+    url: https://www.lakemedelsverket.se/sv/behandling-rekommendationer/
