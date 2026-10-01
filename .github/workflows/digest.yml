@@ -1,0 +1,50 @@
+# PsyDigest — daily psychiatry literature digest
+# Runs on GitHub's free runners, regenerates the static site in docs/,
+# commits it, and GitHub Pages serves it. Manual "Run workflow" button included.
+
+name: Daily digest
+
+on:
+  schedule:
+    # GitHub cron is UTC: 04:00 UTC = 05:00 vintertid / 06:00 sommartid (Sverige).
+    # NOTE: scheduled runs can be delayed a few minutes to ~an hour under load.
+    - cron: "0 4 * * *"
+  workflow_dispatch: {}   # manual trigger from the Actions tab
+
+permissions:
+  contents: write
+
+concurrency:
+  group: digest
+  cancel-in-progress: true
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Build digest
+        env:
+          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+        run: python digest.py
+
+      - name: Commit and publish
+        run: |
+          git config user.name "PsyDigest Bot"
+          git config user.email "actions@github.com"
+          git add docs/
+          if git diff --staged --quiet; then
+            echo "No new articles today — nothing to publish."
+          else
+            git commit -m "Digest $(date -u +%F)"
+            git push
+          fi
