@@ -471,7 +471,7 @@ class MistralClient:
         body = {
             "model": self.model,
             "temperature": 0.2,
-            "max_tokens": 320,
+            "max_tokens": 650,
             "messages": [
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": user_msg},
@@ -638,7 +638,7 @@ function summaryHtml(s) {
   for (let line of String(s).split('\\n')) {
     line = line.trim();
     if (!line) continue;
-    const m = line.match(/^(BACKGROUND|FINDINGS|CLINICAL RELEVANCE)\\s*:\\s*(.+)$/i);
+    const m = line.match(/^(BACKGROUND|FINDINGS|INTERPRETATION|CLINICAL RELEVANCE)\\s*:\\s*(.+)$/i);
     if (m) out.push('<p><b>' + m[1].toUpperCase() + ':</b> ' + esc(m[2]) + '</p>');
     else out.push('<p>' + esc(line) + '</p>');
   }
