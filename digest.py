@@ -50,6 +50,10 @@ DEFAULT_CONFIG: dict[str, Any] = {
         "initial_backfill_days": 14,  # used when data.json is empty
         "max_records_per_query": 100,
         "guideline_days_back": 30,
+        # Relevance gate: articles scoring below this are never stored.
+        "min_score": 5,
+        # Skip studies that concern only children/adolescents.
+        "exclude_child_adolescent": True,
     },
     "llm": {
         "api_key": "",              # better: env MISTRAL_API_KEY
@@ -160,6 +164,25 @@ DEFAULT_CONFIG: dict[str, Any] = {
         ],
         "journal_bonus": 4,
         "guideline_bonus": 6,
+        # A stored article must mention at least one of these terms —
+        # keeps non-psychiatric noise (e.g. generic RCTs or meta-analyses)
+        # out of the digest regardless of its methodological score.
+        "relevance_anchors": [
+            "psychiatr", "mental health", "mental disorder", "mental illness",
+            "neuropsychiatr", "depression", "depressive", "bipolar",
+            "schizophreni", "psychosis", "psychotic", "anxiety", "obsessive",
+            "ocd", "ptsd", "post-traumatic", "trauma", "suicide", "suicidal",
+            "self-harm", "adhd", "attention deficit", "autism", "autistic",
+            "substance use", "alcohol", "opioid", "cannabis", "nicotine",
+            "eating disorder", "anorexia", "bulimia", "binge",
+            "personality disorder", "insomnia", "antipsychotic",
+            "antidepressant", "psychotherapy", "electroconvulsive",
+            "ketamine", "esketamine", "clozapine", "lithium",
+            "psychopharmacol", "transcranial magnetic stimulation",
+            "hallucination", "delusion", "mania", "hypomania",
+            "mood disorder", "affective disorder", "mdd",
+            "severe mental illness",
+        ],
     },
     "watch_links": [
         {
@@ -366,6 +389,11 @@ def parse_pubmed_xml(raw: bytes) -> list[dict]:
                 if pt.text:
                     pub_types.append(pt.text.strip())
 
+            mesh: list[str] = []
+            for mh in medline.findall("MeshHeadingList/MeshHeading/DescriptorName"):
+                if mh.text:
+                    mesh.append(mh.text.strip())
+
             if not title:
                 continue
             out.append(
@@ -378,6 +406,7 @@ def parse_pubmed_xml(raw: bytes) -> list[dict]:
                     "abstract": abstract,
                     "url": f"https://pubmed.ncbi.nlm.nih.gov/{pmid}/",
                     "pub_types": pub_types,
+                    "mesh": mesh,
                 }
             )
         except Exception as exc:
@@ -401,6 +430,34 @@ def score_article(article: dict, cfg: dict) -> int:
     if any("practice guideline" in pt.lower() for pt in article.get("pub_types", [])):
         score += sc["guideline_bonus"]
     return min(score, 60)
+
+
+_AGE_TITLE_RE = re.compile(
+    r"\b(?:child|children|childhood|adolescen\w*|pediatric|paediatric"
+    r"|infant|toddler|preschool|youth|teenager|juvenile)\b",
+    re.IGNORECASE,
+)
+_AGE_MESH = {"child", "child, preschool", "adolescent", "infant"}
+
+
+def is_child_article(article: dict) -> bool:
+    """True if the study concerns only minors (title terms or MeSH age tags)."""
+    if _AGE_TITLE_RE.search(article.get("title") or ""):
+        return True
+    mesh = {m.lower() for m in (article.get("mesh") or [])}
+    return bool(mesh & _AGE_MESH) and "adult" not in mesh
+
+
+def is_relevant(article: dict, cfg: dict) -> bool:
+    """Relevance gate: must mention a psychiatric anchor and — if the
+    reader only wants adult psychiatry — not be a children-only study."""
+    anchors = cfg["scoring"].get("relevance_anchors") or []
+    text = f"{article.get('title', '')} {article.get('abstract', '')}".lower()
+    if anchors and not any(a in text for a in anchors):
+        return False
+    if cfg["pubmed"].get("exclude_child_adolescent", False) and is_child_article(article):
+        return False
+    return True
 
 
 # ---------------------------------------------------------------------------
@@ -524,13 +581,18 @@ def save_state(state: dict) -> None:
 
 
 def write_rss(state: dict, cfg: dict) -> None:
-    items = [a for a in state["articles"] if a.get("summary")][: cfg["site"]["rss_limit"]]
+    # Prefer LLM-summarized articles: the feed is read on mobile and raw
+    # abstract excerpts drown the useful four-section summaries.
+    pool = [a for a in state["articles"] if a.get("summarized")]
+    if not pool:  # e.g. MISTRAL_API_KEY missing — fall back to any summary
+        pool = [a for a in state["articles"] if a.get("summary")]
+    items = pool[: cfg["site"]["rss_limit"]]
     xml_items = []
     for a in items:
         desc = (a.get("summary") or "").replace("<", "&lt;").replace(">", "&gt;")
         xml_items.append(
             "<item>"
-            f"<title>{xml_escape(a['title'])}</title>"
+            f"<title>[{a.get('score', 0)}] {xml_escape(a['title'])}</title>"
             f"<link>{xml_escape(a['url'])}</link>"
             f"<guid isPermaLink='false'>psydigest-{xml_escape(a['pmid'])}</guid>"
             f"<description>{xml_escape(desc)}</description>"
@@ -753,9 +815,13 @@ def run_digest(cfg: dict) -> dict:
         if not llm.enabled:
             log.warning("MISTRAL_API_KEY not set — using abstract excerpts instead.")
         budget = cfg["llm"].get("max_summaries_per_run", 25)
+        min_score = cfg["pubmed"].get("min_score", 0)
         today = datetime.now(timezone.utc).date().isoformat()
         for art in fresh:
             score = score_article(art, cfg)
+            if score < min_score or not is_relevant(art, cfg):
+                stats["skipped"] = stats.get("skipped", 0) + 1
+                continue
             summary, summarized = "", 0
             if art["abstract"] and score >= cfg["llm"].get("min_score_for_summary", 6):
                 if llm.enabled and budget > 0:
@@ -792,6 +858,18 @@ def run_digest(cfg: dict) -> dict:
     state["articles"].sort(key=lambda a: (a.get("added", ""), a.get("score", 0)), reverse=True)
     cutoff = (datetime.now(timezone.utc) - timedelta(days=cfg["site"]["retention_days"])).date().isoformat()
     state["articles"] = [a for a in state["articles"] if a.get("added", "") >= cutoff]
+    # Re-evaluate stored articles against the current relevance rules so
+    # that tightening the gate also cleans up the existing archive.
+    min_score = cfg["pubmed"].get("min_score", 0)
+    before_purge = len(state["articles"])
+    state["articles"] = [
+        a for a in state["articles"]
+        if a.get("score", 0) >= min_score and is_relevant(a, cfg)
+    ]
+    if len(state["articles"]) != before_purge:
+        log.info(
+            "Relevance purge: %d -> %d articles", before_purge, len(state["articles"])
+        )
     state["generated_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
     state["retention_days"] = cfg["site"]["retention_days"]
     state["watch_links"] = cfg["watch_links"]

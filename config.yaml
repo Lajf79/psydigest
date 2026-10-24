@@ -5,7 +5,7 @@
 
 site:
   # Set to your GitHub Pages URL — used in the RSS channel:
-  base_url: "https://YOUR-USERNAME.github.io/psydigest/"
+  base_url: "https://lajf79.github.io/psydigest/"
   retention_days: 90          # articles kept in data.json / searchable archive
   rss_limit: 50
 
@@ -16,6 +16,8 @@ pubmed:
   initial_backfill_days: 14    # first ever run looks this far back
   max_records_per_query: 100
   guideline_days_back: 30
+  min_score: 5                      # articles scoring below are never stored
+  exclude_child_adolescent: true    # skip studies only about minors
 
 llm:
   model: mistral-small-latest
