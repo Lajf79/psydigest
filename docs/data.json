@@ -1,6 +1,20 @@
 {
- "generated_at": "2026-11-08T11:00:27+00:00",
+ "generated_at": "2026-11-09T12:29:18+00:00",
  "articles": [
+  {
+   "pmid": "42999033",
+   "title": "Mindfulness-based interventions for sleep disturbances, physical symptoms, and biological outcomes in women with cancer: a scoping review.",
+   "journal": "J Psychosom Obstet Gynaecol",
+   "authors": "Nguyen HTH, Ngoc Tran T, Hac MH, et al.",
+   "pub_date": "2026-11-07",
+   "abstract": "BACKGROUND: Insomnia is prevalent among women with cancer and often co-occurs with fatigue, pain, and physiological dysregulation, yet these domains are rarely examined together in mindfulness-based intervention (MBI) research. OBJECTIVE: To map the evidence on MBIs for insomnia in this population and examined how physical symptoms and biological outcomes have been assessed alongside sleep. METHODS: Following PRISMA-ScR guidelines, eight databases were searched from inception to January 2026. Eligible studies included adult women with cancer receiving an MBI and reporting sleep outcomes. Data were charted on study characteristics, intervention features, sleep measures, physical symptoms, and biomarkers, and synthesized using tables and visual mapping. RESULTS: Thirty-nine studies were included. Most reported improvements in sleep, while fewer assessed fatigue, pain, or other physical symptoms, and only a small subset included biological markers. Concordance across sleep, physical, and biological domains was limited, with substantial heterogeneity in intervention format and dose. CONCLUSIONS: MBIs consistently improve sleep in women with cancer, but multidomain (sleep, physical, biological) integration remains limited due to heterogeneity. Heterogeneity in populations, interventions, comparators, and outcome measures precludes broad implementation across oncology settings. Standardized, adequately powered, mechanism-informed studies are needed to identify the most appropriate ",
+   "url": "https://pubmed.ncbi.nlm.nih.gov/42999033/",
+   "category": "Research",
+   "score": 5,
+   "summary": "BACKGROUND: Insomnia is prevalent among women with cancer and often co-occurs with fatigue, pain, and physiological dysregulation, yet these domains are rarely examined together in mindfulness-based intervention (MBI) research. OBJECTIVE: To map the evidence on MBIs for insomnia in this population and examined how physical symptoms and biological outcomes have been assessed alongside sleep. METHODS: Following PRISMA-ScR guidelines, eight databases were searched from inception to January 2026. Eligible studies included adult women with cancer receiving an MBI and reporting sleep outcomes.",
+   "summarized": 0,
+   "added": "2026-11-09"
+  },
   {
    "pmid": "42995319",
    "title": "Written exposure therapy as treatment for comorbid PTSD and SUD: a systematic review and meta-analysis.",
