@@ -1,6 +1,20 @@
 {
- "generated_at": "2026-11-21T12:02:44+00:00",
+ "generated_at": "2026-11-22T12:14:35+00:00",
  "articles": [
+  {
+   "pmid": "43066732",
+   "title": "Mobile Apps Supporting Medication Adherence in Substance Use Disorder Treatment: Narrative Review.",
+   "journal": "JMIR Hum Factors",
+   "authors": "Kim JJ, Boschman L, Azar P, et al.",
+   "pub_date": "2026-11-19",
+   "abstract": "BACKGROUND: Substance use disorders (SUDs) and related public health harms have risen significantly in Canada over the past decade. While existing medications for addiction treatment have shown efficacy, poor treatment adherence remains a challenge. With growing rates of smartphone adoption, mobile apps represent an opportunity for digital interventions that can support medication adherence. OBJECTIVE: This study provides a narrative review of current app-based interventions supporting medication adherence for individuals with SUDs and analyzes the common features for advantages and limitations. METHODS: A literature search was conducted on the MEDLINE, APA PsycInfo, CINAHL, PubMed, Scopus, and Web of Science Core Collection databases from inception to October 2026 using the combination of keywords related to substance use, medication adherence, and mobile app. Selected papers focused on specific apps to support medication adherence for SUDs. Common technological features, potential advantages, and limitations of the identified technology apps were extracted and analyzed. RESULTS: This review examined 22 articles. A total of 7 feature types were identified: reminders or reinforcers (eg, contingency management), patient-health care professional communication, information, community boards to connect with support or other anonymous patients, self-monitoring or goal tracking with patient self-report, external tracking (eg, location or electronic medication dispensing), and gamif",
+   "url": "https://pubmed.ncbi.nlm.nih.gov/43066732/",
+   "category": "Research",
+   "score": 7,
+   "summary": "BACKGROUND: The review asks whether smartphone apps can support medication adherence in people with substance use disorders (SUDs), a population where poor adherence undermines effective pharmacotherapy. It synthesizes 22 studies describing app features and early evaluations, but was not designed to quantify clinical effectiveness.\n\nFINDINGS: Seven feature types were identified: reminders/reinforcers (64% of apps), self-monitoring/goal tracking (64%), patient–provider communication (59%), information, community boards, external tracking, and gamification. Most studies were small feasibility or acceptability trials with self-reported outcomes and incomplete data; efficacy was rarely the primary endpoint. Usability ratings and engagement were consistently positive.\n\nINTERPRETATION: The evidence base is preliminary and heterogeneous, with high risk of bias from small, homogeneous samples and reliance on self-report. While user engagement and perceived usefulness are encouraging, there is no reliable evidence that any specific app feature improves medication adherence or clinical outcomes. Funding sources were not reported, so industry influence cannot be excluded.\n\nCLINICAL RELEVANCE: At present, apps may be considered as adjuncts to support engagement, but they cannot be recommended as evidence-based adherence tools. Clinicians should monitor for data completeness and validate self-reported adherence with objective measures when possible.",
+   "summarized": 1,
+   "added": "2026-11-22"
+  },
   {
    "pmid": "43061900",
    "title": "A Narrative Review of Myths and Misconceptions About Methylphenidate in the Treatment of Attention-Deficit/Hyperactivity Disorder.",
